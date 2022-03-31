@@ -97,6 +97,14 @@ def get_apod_date():
     print("APOD date:", apod_date)
     return apod_date
 
+def create_image_db(db_path):
+    import sqlite3
+    
+    #Creates an image database if it doesn't already exist.
+    myConnection = sqlite3.connect(db_path)
+  
+    return
+
 def get_image_path(image_url, dir_path):
     """
     Determines the path at which an image downloaded from
@@ -146,15 +154,6 @@ def save_image_file(image_msg, image_path):
 
     :param image_msg: HTTP response message
     :param image_path: Path to save image file
-    :returns: None
-    """
-    return #TODO
-
-def create_image_db(db_path):
-    """
-    Creates an image database if it doesn't already exist.
-
-    :param db_path: Path of .db file
     :returns: None
     """
     return #TODO

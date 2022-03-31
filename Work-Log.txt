@@ -1,0 +1,11 @@
+2022-03-31 (1 hour)
+-Copied the template from D2L
+-Set up VS code for debugging
+-Set up git ignore to not include VS code files
+-Made the repo in GitHub for the Project to be stored
+-Worked on the function "create_image_db"
+
+2022-04-__ 
+-
+-
+-
