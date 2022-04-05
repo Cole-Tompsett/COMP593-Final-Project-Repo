@@ -102,6 +102,23 @@ def create_image_db(db_path):
     
     #Creates an image database if it doesn't already exist.
     myConnection = sqlite3.connect(db_path)
+
+    myCursor = myConnection.cursor()
+
+    Create_Table = """CREATE TABLE IF NOT EXISTS apod (
+                      id integer PRIMARY KEY,
+                      Location text NOT NULL,
+                      File_Size integer NOT NULL,
+                      name text NOT NULL,
+                      SHA256 text NOT NULL,
+                      Downloaded_day date NOT NULL,
+                      Downloaded_time datetime NOT NULL                      
+    );"""
+
+    myCursor.execute(Create_Table)
+   
+    myConnection.commit()
+    myConnection.close()
   
     return
 
