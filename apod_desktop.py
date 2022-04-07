@@ -13,13 +13,16 @@ Parameters:
   apod_date = APOD image date (format: YYYY-MM-DD)
 
 History:
-  Date        Author    Description
-  2022-03-11  J.Dalby   Initial creation
+  Date        Author       Description
+  2022-03-11  J.Dalby      Initial creation
+  2022-04-29  C.Tompsett   Added functionality to the script
 """
 from sys import argv, exit
 from datetime import datetime, date
 from hashlib import sha256
 from os import path
+from urllib import request
+import requests
 
 def main():
 
@@ -34,10 +37,10 @@ def main():
     create_image_db(db_path)
 
     # Get info for the APOD
-    apod_info_dict = get_apod_info(apod_date)
+    apod_dict = get_apod_info(apod_date)
     
     # Download today's APOD
-    image_url = "TODO"
+    image_url = apod_dict['hdurl']
     image_msg = download_apod_image(image_url)
     image_sha256 = "TODO"
     image_size = -1 # TODO
@@ -131,29 +134,33 @@ def get_image_path(image_url, dir_path):
     :param dir_path: Path of directory in which image is saved locally
     :returns: Path at which image is saved locally
     """
-    return "TODO"
+    return("TODO")
 
 def get_apod_info(date):
     """
     Gets information from the NASA API for the Astronomy 
     Picture of the Day (APOD) from a specified date.
+    """
+    
+    api_key = "oWaOkx1MjdytmIa9VcVA74jpek7Qe7ippCfbKgr2"
+    Apod_photo = requests.get("https://api.nasa.gov/planetary/apod?api_key="+api_key+"&date="+date)
 
-    :param date: APOD date formatted as YYYY-MM-DD
-    :returns: Dictionary of APOD info
-    """    
-    return {"todo" : "TODO"}
+    apod_dict = Apod_photo.json()
+    #print(apod_dict)
+    
+    return(apod_dict)
 
 def print_apod_info(image_url, image_path, image_size, image_sha256):
-    """
-    Prints information about the APOD
+    
+    
 
-    :param image_url: URL of image
-    :param image_path: Path of the image file saved locally
-    :param image_size: Size of image in bytes
-    :param image_sha256: SHA-256 of image
-    :returns: None
-    """    
-    return #TODO
+    print(image_url)
+    print(image_path)
+    print(image_size) #"bytes"
+    print(image_sha256)
+    
+        
+    return
 
 def download_apod_image(image_url):
     """
@@ -162,6 +169,11 @@ def download_apod_image(image_url):
     :param image_url: URL of image
     :returns: Response message that contains image data
     """
+
+    Download_image = request.get(image_url)
+
+    
+
     return "TODO"
 
 def save_image_file(image_msg, image_path):

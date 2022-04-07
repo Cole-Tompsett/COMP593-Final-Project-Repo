@@ -10,7 +10,13 @@
 -create_image_db now creates the table to store all the information
 -
 
-2022-04-05
--
--
--
+2022-04-05 (1 hour)
+-Worked on the function get "apod_date"
+-Had difficulty getting a response of "200"
+-After 20 min I accepted defeat and had to research the proper way to make a request using the nasa api
+-After solving my issue I was able to complete the function and fill in the variable "image_url"
+
+2022-04-6 (15min)
+-started the "print_apod_info" function (put the print statments in)
+-gave a few more variables values
+
