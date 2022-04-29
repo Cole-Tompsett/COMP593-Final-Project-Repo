@@ -8,7 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "args":["C:\\Users\\colet\\Desktop\\Comp593-Final-Project\\APOD", "2022-03-31"],
+            "args":[" ", " "],
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true

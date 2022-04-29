@@ -16,7 +16,72 @@
 -After 20 min I accepted defeat and had to research the proper way to make a request using the nasa api
 -After solving my issue I was able to complete the function and fill in the variable "image_url"
 
-2022-04-6 (15min)
+2022-04-06 (15min)
 -started the "print_apod_info" function (put the print statments in)
--gave a few more variables values
+- gave a few more variables values
 
+2022-04-14 (1 hour)
+- Successfully downloaded the image from the nasa image_url
+- started calculating the sha256 of the image
+- had to go through python docs and exmaples online of how to use hashlibs to calculate the sha256
+
+2022-04-16 (1 hour)
+- Finished the "print_apod_info" function
+- Had difficulty diplaying the proper hash number so I had to look through the documentation hashlib and stackoverflow for assistance
+- I was missing the ".hexdigest" on the end of the command. No that i have it there it gives a real hash value instead of a mess of text
+
+2022-04-21(30 min)
+-added a regex to the "get_image_path" fuction in order to shorten the name of the files
+- The regex takes everything after the last "/" in the url and makes that the name of the file 
+- Tested the regex with multiple dates/urls and there were no problems
+
+2022-04-21(30min)
+- Created the "save_image_file" function
+- Had difficulty getting the code to run for the actual saving of the image
+- rewatched lab 9 recrding to see what I missed and also searched it up on stack overflow
+- I was missing the "with" a the begining of the statement
+
+2022-04-21 (1 hour 30 min)
+-Created the "add_image_to_db" function
+-Had difficulty getting it to work, it kept giving me a syntax error around the last ")" in my "new_apod" query. Which didnt help me much if at all
+-After loking through the python docs for awhile and getting more confused I looked through lab 3 to get the structure we used. It looked like it followed the same structure
+-I finally got a useful error message telling me one of the names in my query didnt match the one in my database, which was my exact problem 
+-After double checking all my names it finally makes entries in the database.
+
+2022-04-21 (45min)
+- Started work on "image_already_in_db" function 
+- Able to query the database just having difficulty with verifying if an image is in the database
+
+2022-04-21(20 min)
+-Started and finished the "set_desktop_background_image" function
+-I referenced the lab 9(1:51:30) lecture video for the line of code that enables it to set your background image.
+-Everything now works in the script except for the "image_already_in_db" function... That's a problem for future me.
+
+2022-04-26 (1 hour 30 min)
+- I found the issue with "image_already_in_db"
+- While I was looking through stackoverflow and our previous assignments I couldn't find an answer to my issue 
+-BUT when I looked a closer at the way we wrote out results to a file in lab 4 I realized that I have to give the index of the result I wanted even though it was only giving me one result
+- The code I orignally had to compare the SHA256 values was:
+    for compare_sha256 in results:
+        print(compare_sha256)
+- what I needed to have:
+    for compare_sha256 in results:
+        print(compare_sha256[0]) 
+-This is just what I used to test if it was working and giving me a value i could compare, so it's not my final code I used in my function.
+-full code(for easy understanding/access) to check if it works:
+    for compare_sha256 in results:
+        if compare_sha256[0] == image_sha256:
+            print("Image already in database")
+            myConnection.close()
+            return(True)
+    print("Image saved to database")    
+    
+    return(False)
+
+2022-04-26(15min)
+-spent 10 min inputing random dates to test if i can find any errors with the program
+-spent 5 min being disappointed that my birthdate(2002-06-08) has a depressing APOD :(
+
+2022-04-29(15 min)
+-added comments
+-removed the args I had in place, in the lauch.json file so the user could add their own

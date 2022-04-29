@@ -9,6 +9,7 @@ __pycache__/
 #VS Code extensions
 *.code-workspace
 
+
 # Distribution / packaging
 .Python
 build/

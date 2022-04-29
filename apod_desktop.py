@@ -23,6 +23,8 @@ from hashlib import sha256
 from os import path
 from urllib import request
 import requests
+import re
+import sqlite3
 
 def main():
 
@@ -41,18 +43,19 @@ def main():
     
     # Download today's APOD
     image_url = apod_dict['hdurl']
+#   image_msg = apod_dict['explanation']
     image_msg = download_apod_image(image_url)
-    image_sha256 = "TODO"
-    image_size = -1 # TODO
+    image_sha256 = sha256(download_apod_image(image_url)).hexdigest()
+    image_size = len(download_apod_image(image_url))
     image_path = get_image_path(image_url, image_dir_path)
 
     # Print APOD image information
     print_apod_info(image_url, image_path, image_size, image_sha256)
-
+  
     # Add image to cache if not already present
     if not image_already_in_db(db_path, image_sha256):
         save_image_file(image_msg, image_path)
-        add_image_to_db(db_path, image_path, image_size, image_sha256)
+        add_image_to_db(db_path, image_path, image_size, image_sha256,apod_dict)
 
     # Set the desktop background image to the selected APOD
     set_desktop_background_image(image_path)
@@ -101,25 +104,24 @@ def get_apod_date():
     return apod_date
 
 def create_image_db(db_path):
-    import sqlite3
+    
     
     #Creates an image database if it doesn't already exist.
     myConnection = sqlite3.connect(db_path)
-
     myCursor = myConnection.cursor()
 
+#Creates the table where the apod information will be stored in the database
     Create_Table = """CREATE TABLE IF NOT EXISTS apod (
                       id integer PRIMARY KEY,
+                      Name text NOT NULL,
                       Location text NOT NULL,
                       File_Size integer NOT NULL,
-                      name text NOT NULL,
                       SHA256 text NOT NULL,
-                      Downloaded_day date NOT NULL,
-                      Downloaded_time datetime NOT NULL                      
-    );"""
+                      Date_Added date NOT NULL
+                    );"""
 
     myCursor.execute(Create_Table)
-   
+#commits the changes to the db and then closes it   
     myConnection.commit()
     myConnection.close()
   
@@ -134,89 +136,131 @@ def get_image_path(image_url, dir_path):
     :param dir_path: Path of directory in which image is saved locally
     :returns: Path at which image is saved locally
     """
-    return("TODO")
+#uses a regex to make the name of the file more manageable and readable for the user
+    match =re.search(r'.*/(.*)', image_url )
+    short_name = match.group(1)
 
-def get_apod_info(date):
+#adds the image to the folder specified by the user
+    save_spot = dir_path + "\\" + short_name
+
+    return(save_spot)
+
+def get_apod_info(date): 
     """
     Gets information from the NASA API for the Astronomy 
     Picture of the Day (APOD) from a specified date.
     """
-    
+#making the http request to the NASA APOD API    
     api_key = "oWaOkx1MjdytmIa9VcVA74jpek7Qe7ippCfbKgr2"
     Apod_photo = requests.get("https://api.nasa.gov/planetary/apod?api_key="+api_key+"&date="+date)
 
+#makes the http request in to a dictionary
     apod_dict = Apod_photo.json()
-    #print(apod_dict)
+    
     
     return(apod_dict)
 
 def print_apod_info(image_url, image_path, image_size, image_sha256):
     
-    
+    #Prints useful information to the CLI to inform the user of
+    #what is happening during the process of runnnign the program
 
-    print(image_url)
-    print(image_path)
-    print(image_size) #"bytes"
-    print(image_sha256)
+    print("Retrieving the image from", image_url, "\n ")
+    print("The image will be stored at", image_path, "\n")
+    print("The image is", image_size,"bytes \n") 
+    print("The sha256 value of the image is", image_sha256,"\n")
     
         
     return
 
 def download_apod_image(image_url):
-    """
-    Downloads an image from a specified URL.
 
-    :param image_url: URL of image
-    :returns: Response message that contains image data
-    """
-
-    Download_image = request.get(image_url)
-
+#Downloads an image from a specified URL. and returns the binary string of the image
+    get_image = requests.get(image_url)
+    image_data= get_image.content
     
 
-    return "TODO"
+
+
+    return (image_data)
 
 def save_image_file(image_msg, image_path):
-    """
-    Extracts an image file from an HTTP response message
-    and saves the image file to disk.
 
-    :param image_msg: HTTP response message
-    :param image_path: Path to save image file
-    :returns: None
-    """
-    return #TODO
+    #saves image that was downloaded from the url
+    with open(image_path, 'wb') as fp:
+        fp.write(image_msg)
 
-def add_image_to_db(db_path, image_path, image_size, image_sha256):
+    return
+
+def add_image_to_db(db_path, image_path, image_size, image_sha256,apod_dict):
     """
     Adds a specified APOD image to the DB.
-
-    :param db_path: Path of .db file
-    :param image_path: Path of the image file saved locally
-    :param image_size: Size of image in bytes
-    :param image_sha256: SHA-256 of image
-    :returns: None
     """
-    return #TODO
+#used datetime to add a specific time the APOD was added to the db
+    from datetime import datetime
+
+#connecting to the db
+    myConnection = sqlite3.connect(db_path)
+    myCursor = myConnection.cursor()
+
+#makes the query requirments for the image    
+    new_apod_query="""INSERT INTO apod (
+                      Name, 
+                      Location, 
+                      File_size, 
+                      SHA256, 
+                      Date_Added)
+                   VALUES (?, ?, ?, ?, ?);"""
+
+#adds the information about the APOD to the db 
+    new_apod = ( apod_dict["title"], 
+                image_path, 
+                image_size, 
+                image_sha256, 
+                datetime.now())
+    
+    myCursor.execute(new_apod_query, new_apod)
+#commits changes to the db and closes it
+    myConnection.commit()
+    myConnection.close()
+    
+    return
 
 def image_already_in_db(db_path, image_sha256):
     """
     Determines whether the image in a response message is already present
     in the DB by comparing its SHA-256 to those in the DB.
-
-    :param db_path: Path of .db file
-    :param image_sha256: SHA-256 of image
-    :returns: True if image is already in DB; False otherwise
     """ 
-    return True #TODO
+    print("Checking Database...",end=" ")
 
+    myConnection = sqlite3.connect(db_path)
+    my_cursor = myConnection.cursor()
+
+#grabs the SHA256 entries from the db
+    image_check_query = """SELECT SHA256 from apod"""
+
+    my_cursor.execute(image_check_query)
+    results = my_cursor.fetchall()
+
+#compares the SHA256 of the downloaded image to the ones in the db. Saves it if not in the db, if it is in db it does nothing
+    for compare_sha256 in results:
+        if compare_sha256[0] == image_sha256:
+            print("Image already in database")
+            myConnection.close()
+            return(True)
+    
+    print("Image saved to database")    
+    
+    return(False)
+     
 def set_desktop_background_image(image_path):
+    import ctypes
     """
     Changes the desktop wallpaper to a specific image.
 
-    :param image_path: Path of image file
-    :returns: None
     """
-    return #TODO
+    ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 0)
+
+    return
 
 main()
